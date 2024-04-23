@@ -125,7 +125,12 @@
   
   <main>
     <h1>Tree-width</h1>
-    Your mission is find a tree decomposition of tree-width 2.
+    Your mission is find a tree decomposition of tree-width 2:
+    <ul>
+        <li>Endpoints of each edge should appear in a same bag of the tree decomposition.</li>
+        <li>Each bag should contain at most 3 vertices.</li>
+        <li>The bags containing a given vertex should form a connected component in the tree decomposition.</li>
+    </ul>
     <div
       id="youwon"
       class:youloose={!youwon(decomposition)}
