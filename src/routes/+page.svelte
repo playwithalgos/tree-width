@@ -93,7 +93,7 @@
         expectedTreeWidth = instance.expectedTreeWidth;
     }
 
-    loadLevel(level2);
+    loadLevel(level1);
 
     function getPositionVertexInBag(node, vertexi: number) {
         const vertex = graph.vertices[vertexi];
