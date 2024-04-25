@@ -1,4 +1,11 @@
 <script lang="ts">
+    /**
+     * A level is specified by a graph (vertices and edges),
+     * a tree decomposition skeleton (nodes, bags that may contain some initial hints, and edges)
+     * and the expected tree width (for the winning condition)
+     *
+     * /*\ The terminology is: a "vertex" denotes a point in the graph. A "node" denotes a point in the tree decomposition.
+     */
     const level1 = {
         graph: {
             vertices: [
@@ -69,9 +76,23 @@
                 { x: 200, y: 350 },
                 { x: 200, y: 200 },
                 { x: 200, y: 50 },
-           
             ],
-            bags: [[{ i: 0, x: 0, y: 0 }], [], [], [], [], [], [], [], [], [], [], [], [], []],
+            bags: [
+                [{ i: 0, x: 0, y: 0 }],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+            ],
             edges: [
                 [0, 1],
                 [1, 2],
@@ -83,26 +104,83 @@
         expectedTreeWidth: 3,
     };
 
+    const level3 = {
+        graph: {
+            vertices: [
+                { x: 150, y: 20 },
+                { x: 150, y: 120 },
+                { x: 100, y: 200 },
+                { x: 200, y: 200 },
+                { x: 50, y: 280 },
+                { x: 150, y: 280 },
+                { x: 250, y: 280 },
+            ],
+            edges: [
+                [0, 1],
+                [1, 2],
+                [1, 3],
+                [2, 4],
+                [2, 5],
+                [3, 5],
+                [3, 6],
+                [4, 5],
+                [5, 6],
+            ],
+        },
+        decomposition: {
+            nodes: [
+                { x: 200, y: 50 },
+                { x: 200, y: 180 },
+                { x: 200, y: 300 },
+                { x: 100, y: 420 },
+                { x: 300, y: 420 },
+            ],
+            bags: [[{ i: 0, x: 0, y: 0 }], [], [], [], []],
+            edges: [
+                [0, 1],
+                [1, 2],
+                [2, 3],
+                [2, 4],
+            ],
+        },
+        expectedTreeWidth: 2,
+    };
+
     let graph;
     let decomposition;
     let expectedTreeWidth;
 
-    function loadLevel(instance) {
-        graph = instance.graph;
-        decomposition = instance.decomposition;
-        expectedTreeWidth = instance.expectedTreeWidth;
+    /**
+     * @description load the level
+     */
+    function loadLevel(level) {
+        graph = level.graph;
+        decomposition = level.decomposition;
+        expectedTreeWidth = level.expectedTreeWidth;
     }
 
     loadLevel(level1);
 
-    function getPositionVertexInBag(node, vertexi: number) {
-        const vertex = graph.vertices[vertexi];
+    /**
+     *
+     * @param node
+     * @param ivertex
+     * @returns the point where the vertex of index vertexi should be in the node
+     */
+    function getPositionVertexInBag(node, ivertex: number) {
+        const vertex = graph.vertices[ivertex];
         return {
             x: node.x + (vertex.x - 150) / 4,
             y: node.y + (vertex.y - 150) / 4,
         };
     }
 
+    /**
+     *
+     * @param inode
+     * @param ivertex
+     * @description add/remove the vertex of ID ivertex in the bag of node of ID inode
+     */
     function toggleVertex(inode: number, ivertex: number) {
         function removeVertexFromBag(inode: number, ivertex: number) {
             decomposition.bags[inode] = decomposition.bags[inode].filter(
@@ -121,10 +199,20 @@
         decomposition = decomposition;
     }
 
+    /**
+     *
+     * @param decomposition
+     * @returns the width of the decomposition
+     */
     function width(decomposition) {
         return Math.max(...decomposition.bags.map((b) => b.length)) - 1;
     }
 
+    /**
+     *
+     * @param decomposition
+     * @returns true if all edges are treated
+     */
     function isConstraintAllEdges(decomposition) {
         return graph.edges.every((e) => isEdgeTreated(decomposition, e));
     }
@@ -135,10 +223,16 @@
         );
     }
 
-    function isConnected(decomposition, vertexi: number) {
+    /**
+     *
+     * @param decomposition
+     * @param ivertex
+     * @returns true if the component of nodes containing vertex of ID ivertex is connected
+     */
+    function isConnected(decomposition, ivertex: number) {
         const S = decomposition.nodes
             .map((v, i) => i)
-            .filter((i) => decomposition.bags[i].some((v) => v.i == vertexi));
+            .filter((i) => decomposition.bags[i].some((v) => v.i == ivertex));
         console.log(S);
         const visited: boolean[] = [];
 
@@ -162,36 +256,44 @@
         return dfs(S[0]) == S.length;
     }
 
-        function youwon(decomposition) {
-        const constraintConnectivity = graph.vertices
+    function isConstraintConnectivity(decomposition) {
+        return graph.vertices
             .map((v, vi) => vi)
             .every((vi) => isConnected(decomposition, vi));
-        const constraintEdges = graph.edges.every((e) =>
-            isEdgeTreated(decomposition, e),
-        );
+    }
+
+    function isContraintTreeWidth(decomposition) {
+        return width(decomposition) <= expectedTreeWidth;
+    }
+    function youwon(decomposition) {
         return (
-            constraintConnectivity &&
-            constraintEdges &&
-            expectedTreeWidth == width(decomposition)
+            isConstraintConnectivity(decomposition) &&
+            isConstraintAllEdges(decomposition) &&
+            isContraintTreeWidth(decomposition)
         );
     }
 </script>
 
 <main>
-    <h1>Tree-width <button on:click={() => loadLevel(level1)}>Level 1</button><button on:click={() => loadLevel(level2)}>Level 2</button></h1>
+    <h1>
+        Tree-width
+        <button on:click={() => loadLevel(level1)}>Level 1</button>
+        <button on:click={() => loadLevel(level2)}>Level 2</button>
+        <button on:click={() => loadLevel(level3)}>Level 3</button>
+    </h1>
     Your mission is find a tree decomposition of tree-width
-    <div>{expectedTreeWidth}</div>
-    :
+    <div>{expectedTreeWidth}:</div>
     <ul>
-        <li>
+        <li class:good={isConstraintAllEdges(decomposition)}>
             Endpoints of each edge should appear in a same bag of the tree
             decomposition.
         </li>
-        <li>
-            Each bag should contain at most <div>{expectedTreeWidth + 1}</div>
+        <li class:good={isContraintTreeWidth(decomposition)}>
+            Each bag should contain at most
+            {expectedTreeWidth + 1}
             vertices.
         </li>
-        <li>
+        <li class:good={isConstraintConnectivity(decomposition)}>
             The bags containing a given vertex should form a connected component
             in the tree decomposition.
         </li>
@@ -310,9 +412,12 @@
         color: white;
     }
 
+    li {
+        color: orangered;
+    }
     .good {
-        color: green;
-        stroke: green;
+        color: rgb(0, 192, 0);
+        stroke: rgb(0, 192, 0);
     }
 
     @keyframes bad {
