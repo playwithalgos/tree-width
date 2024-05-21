@@ -146,6 +146,57 @@
         expectedTreeWidth: 2,
     };
 
+    const level4 = {
+        graph: {
+            vertices: [
+                { x: 150, y: 20 },
+                { x: 110, y: 90 },
+                { x: 190, y: 90 },
+                { x: 50, y: 160 },
+                { x: 100, y: 160 },
+                { x: 200, y: 160 },
+                { x: 250, y: 160 },
+                { x: 110, y: 220 },
+                { x: 190, y: 220 },
+                { x: 150, y: 280 },
+            ],
+            edges: [
+                [0, 1],
+                [0, 2],
+                [1, 3],
+                [1, 4],
+                [2, 5],
+                [2, 6],
+                [3, 4],
+                [4, 5],
+                [5, 6],
+                [9, 8],
+                [9, 7],
+                [7, 3],
+                [7, 4],
+                [8, 5],
+                [8, 6],
+            ],
+        },
+        decomposition: {
+            nodes: [
+                { x: 200, y: 100 },
+                { x: 100, y: 220 },
+                { x: 300, y: 220 },
+                { x: 100, y: 390 },
+                { x: 300, y: 390 },
+            ],
+            bags: [[{ i: 0, x: 0, y: 0 }], [], [], [], []],
+            edges: [
+                [0, 1],
+                [0, 2],
+                [1, 3],
+                [2, 4],
+            ],
+        },
+        expectedTreeWidth: 4,
+    };
+
     let graph;
     let decomposition;
     let expectedTreeWidth;
@@ -280,6 +331,7 @@
         <button on:click={() => loadLevel(level1)}>Level 1</button>
         <button on:click={() => loadLevel(level2)}>Level 2</button>
         <button on:click={() => loadLevel(level3)}>Level 3</button>
+        <button on:click={() => loadLevel(level4)}>Level 4</button>
     </h1>
     Your mission is find a tree decomposition of tree-width
     <div>{expectedTreeWidth}:</div>
